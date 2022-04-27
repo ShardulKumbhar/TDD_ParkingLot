@@ -4,6 +4,9 @@ public class Car {
     private String id;
     private String regNumber;
 
+    /*
+    constructor
+     */
     public Car(String id, String regNumber) {
         this.regNumber = regNumber;
         this.id = id;
