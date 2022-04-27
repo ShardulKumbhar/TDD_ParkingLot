@@ -1,86 +1,89 @@
 package com.bridgelabzparkinglot;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 public class ParkingLotServiceTest {
     ParkingLot parkingLot = null;
-    Object vehicle = null;
-    Object vehicle2 = null;
+    AirportSecurity security = null;
 
     @BeforeEach
     public void setUp() {
         parkingLot = new ParkingLot();
-        vehicle = new Object();
-        vehicle2 = new Object();
+        security = new AirportSecurity();
     }
 
     /**
-     * UC1-to park the vehicle return true
-     *
+     * UC1- to park
      * @throws ParkingLotException
      */
     @Test
     public void givenVehicle_WhenPark_ShouldReturnTrue() throws ParkingLotException {
-        parkingLot.parkVehicle(vehicle);
-        boolean isParked = parkingLot.isParked();
+        Car car = new Car("1", "MH-Swift");
+        parkingLot.parkVehicle(car);
+        boolean isParked = parkingLot.isParked(car);
         Assertions.assertTrue(isParked);
     }
 
     /**
-     * UC2-UnPark Vehicle retur true
-     *
+     * UC-2 to Unpark
      * @throws ParkingLotException
      */
     @Test
     public void givenVehicleIfParked_WhenUnParked_ShouldReturnTrue() throws ParkingLotException {
-        parkingLot.parkVehicle(vehicle);
-        parkingLot.unParkVehicle(vehicle);
-        boolean isUnParked = parkingLot.isUnParked();
+        Car car = new Car("1", "MH-Swift");
+        parkingLot.parkVehicle(car);
+        parkingLot.unParkVehicle(car);
+        boolean isUnParked = parkingLot.isUnParked(car);
         Assertions.assertTrue(isUnParked);
     }
 
     /**
-     * @throws ParkingLotException
+     * UC2-Unpark Null Condition
      */
-    @Test
-    public void givenVehicle_WhenAlreadyParked_ShouldReturnFalse() throws ParkingLotException {
-        parkingLot.parkVehicle(vehicle);
-        boolean parkingStatus = parkingLot.isUnParked();
-        Assertions.assertFalse(parkingStatus);
-    }
-
-    @Test
-    public void givenVehicleIfParked_AndGivenDifferentVehicleToUnPark_ShouldReturnFalse() throws ParkingLotException {
-        parkingLot.parkVehicle(vehicle);
-        boolean parkingStatus = parkingLot.isUnParked();
-        Assertions.assertFalse(parkingStatus);
-    }
-
-    /**
-     * UC -3 Check for Parking lot is full
-     */
-    @Test
-    public void givenVehicleToPark_IfLotFull_ShouldThrowException() {
-        try {
-            parkingLot.parkVehicle(vehicle);
-            parkingLot.parkVehicle(vehicle2);
-        } catch (ParkingLotException e) {
-            System.out.println(e.type);
-            Assertions.assertEquals(e.type, ParkingLotException.ExceptionType.LOT_FULL);
-        }
-    }
-
     @Test
     public void givenVehicleToUnPark_WhenNull_ShouldThrowException() {
         try {
-            parkingLot.parkVehicle(vehicle);
+            Car car = new Car("1", "MH-Swift");
+            parkingLot.parkVehicle(car);
             parkingLot.unParkVehicle(null);
         } catch (ParkingLotException e) {
             System.out.println(e.type);
-            Assertions.assertEquals(e.type, ParkingLotException.ExceptionType.NO_SUCH_VEHICLE);
+            Assertions.assertEquals(ParkingLotException.ExceptionType.NO_SUCH_VEHICLE, e.type);
         }
+    }
+    /**
+     * UC3 -to show parking lot is full
+     * @throws ParkingLotException
+     */
+    @Test
+    public void givenVehicleToPark_WhenMoreNumberOfVehicles_ShouldThrowException() {
+        try {
+            Car car = new Car("1", "MH_Swift");
+            Car car2 = new Car("2", "KA-Venu");
+            Car car3 = new Car("3", "GA-polo");
+            parkingLot.parkVehicle(car);
+            parkingLot.parkVehicle(car2);
+            parkingLot.parkVehicle(car3);
+        } catch (ParkingLotException e) {
+            Assertions.assertEquals(ParkingLotException.ExceptionType.LOT_FULL, e.type);
+        }
+    }
+
+    /**
+     * UC4 -to show parking lot is full - to security and owner
+     * @throws ParkingLotException
+     */
+    @Test
+    public void givenVehicleToPark_WhenOwnerAndSecurity_ShouldInformInformLotFull() throws ParkingLotException {
+
+        parkingLot.addMonitor(security);
+        Car car = new Car("1", "MH-Swift");
+        Car car2 = new Car("2", "KA-Venu");
+        parkingLot.parkVehicle(car);
+        parkingLot.parkVehicle(car2);
+        Assertions.assertEquals("Parking Lot Is Full", security.getMessage());
     }
 
 }
