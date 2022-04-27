@@ -9,8 +9,7 @@ public class Car {
         this.id = id;
     }
 
-    public String getID()
-    {
+    public String getID() {
         return id;
     }
 }
