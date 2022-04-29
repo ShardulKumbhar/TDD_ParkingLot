@@ -1,4 +1,4 @@
-package com.bridgelabzparkinglot;
+package com.bridgelabzparkinglot.entity;
 
 public class Car {
     private String id;
@@ -12,7 +12,8 @@ public class Car {
         this.id = id;
     }
 
-    public String getID() {
+    public String getID()
+    {
         return id;
     }
 }

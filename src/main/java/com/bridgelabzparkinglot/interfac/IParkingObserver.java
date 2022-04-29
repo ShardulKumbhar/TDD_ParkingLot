@@ -1,6 +1,6 @@
-package com.bridgelabzparkinglot;
+package com.bridgelabzparkinglot.interfac;
 
-public interface IParkingMonitor {
+public interface IParkingObserver {
     public void updateMessage(String message);
 
     public String getMessage();

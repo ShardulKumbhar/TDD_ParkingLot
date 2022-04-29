@@ -1,4 +1,10 @@
-package com.bridgelabzparkinglot;
+package com.bridgelabzparkinglot.entity;
+
+import com.bridgelabzparkinglot.Notifications;
+import com.bridgelabzparkinglot.entity.Car;
+import com.bridgelabzparkinglot.exception.ParkingLotException;
+import com.bridgelabzparkinglot.interfac.IParkingLot;
+import com.bridgelabzparkinglot.interfac.IParkingObserver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,8 +14,9 @@ import java.util.Map;
 public class ParkingLot implements IParkingLot {
 
     final int PARKING_LOT_CAPACITY = 2;
-    private final List<IParkingMonitor> monitors = new ArrayList<>();
+    private final List<IParkingObserver> monitors = new ArrayList<>();
     private final Map<String, Car> parkingMap = new HashMap<>();
+
 
     /**
      * Method To Park The Car.
@@ -34,9 +41,10 @@ public class ParkingLot implements IParkingLot {
 
     /**
      * Method To Un-Park The Car.
-     *if car=null shows empty parking(no such vehicle) throws Exception
+     * if car=null shows empty parking(no such vehicle) throws Exception
      * if parked car and given car id is different shows mismatch exception
      * else car with matching id get remove or unparked
+     *
      * @param car object
      * @throws ParkingLotException NO SUCH VEHICLE
      */
@@ -44,9 +52,10 @@ public class ParkingLot implements IParkingLot {
     public void unParkVehicle(Car car) throws ParkingLotException {
         if (car == null)
             throw new ParkingLotException(ParkingLotException.ExceptionType.NO_SUCH_VEHICLE);
-        if (!parkingMap.containsKey(car.getID()))
-            throw new ParkingLotException(ParkingLotException.ExceptionType.VEHICLE_MISMATCH);
+//       if (!parkingMap.containsKey(car.getID()))
+//           throw new ParkingLotException(ParkingLotException.ExceptionType.VEHICLE_MISMATCH);
         parkingMap.remove(car.getID());
+        this.notifyToObserver(Notifications.HAVE_SPACE_TO_PARK.message);
     }
 
     /**
@@ -55,9 +64,18 @@ public class ParkingLot implements IParkingLot {
      * @param monitor
      */
     @Override
-    public void addMonitor(IParkingMonitor monitor)
-    {
+    public void addMonitor(IParkingObserver monitor) {
         this.monitors.add(monitor);
+    }
+
+    @Override
+    public void notifyToObserver(String message) {
+
+    }
+
+    @Override
+    public void addObserver(IParkingObserver monitor) {
+
     }
 
     /**
@@ -65,7 +83,7 @@ public class ParkingLot implements IParkingLot {
      */
     @Override
     public void notifyToMonitor() {
-        for (IParkingMonitor monitor : monitors) {
+        for (IParkingObserver monitor : monitors) {
             monitor.updateMessage("Parking Lot Is Full");
         }
     }
@@ -76,8 +94,7 @@ public class ParkingLot implements IParkingLot {
      * @return boolean value
      */
     @Override
-    public boolean isParked(Car car)
-    {
+    public boolean isParked(Car car) {
         return parkingMap.containsKey(car.getID());
     }
 
@@ -87,8 +104,17 @@ public class ParkingLot implements IParkingLot {
      * @return boolean value
      */
     @Override
-    public boolean isUnParked(Car car)
-    {
+    public boolean isUnParked(Car car) {
         return (!parkingMap.containsKey(car.getID()));
     }
+
+    @Override
+    public String getVehicle(Car car) {
+        for (String key : parkingMap.keySet()) {
+            if (parkingMap.get(key) == car)
+                return key;
+        }
+        return null;
+    }
+
 }

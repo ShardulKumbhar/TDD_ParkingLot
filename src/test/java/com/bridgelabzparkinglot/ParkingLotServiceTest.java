@@ -1,6 +1,11 @@
 package com.bridgelabzparkinglot;
 
 
+import com.bridgelabzparkinglot.entity.AirportSecurity;
+import com.bridgelabzparkinglot.entity.Car;
+import com.bridgelabzparkinglot.entity.Owner;
+import com.bridgelabzparkinglot.entity.ParkingLot;
+import com.bridgelabzparkinglot.exception.ParkingLotException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -87,6 +92,9 @@ public class ParkingLotServiceTest {
         Assertions.assertEquals("Parking Lot Is Full", security.getMessage());
     }
 
+    /**
+     * UC5 - showing lot full when more vehicles get parked
+     */
     @Test
     public void givenVehicleToPark_WhenMoreNumberOfVehicles_ShouldThrowException() {
         try {
@@ -117,5 +125,4 @@ public class ParkingLotServiceTest {
             Assertions.assertEquals(ParkingLotException.ExceptionType.VEHICLE_MISMATCH, e.type);
         }
     }
-
 }
