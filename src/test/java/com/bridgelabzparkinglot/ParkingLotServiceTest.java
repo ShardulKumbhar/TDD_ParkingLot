@@ -126,4 +126,14 @@ public class ParkingLotServiceTest {
         boolean isParked = parkingLot.isParked(car2);
         assertTrue(isParked);
     }
+    /**
+     * UC 7 : As a driver I want to find the car
+     */
+    @Test
+    public void givenDriven_WhenFoundTheCar_shouldReturnLotNumber() throws ParkingLotException {
+        parkingLot.parkVehicle(car1);
+        parkingLot.parkVehicle(car2);
+        int lotNumber = parkingLot.getVehicle(car2);
+        assertEquals(2, lotNumber);
+    }
 }
