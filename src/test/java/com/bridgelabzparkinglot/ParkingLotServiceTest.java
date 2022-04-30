@@ -10,9 +10,9 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.jar.Pack200;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParkingLotServiceTest {
 
@@ -38,7 +38,6 @@ public class ParkingLotServiceTest {
 
     /**
      * UC1- to park
-     *
      */
     @Test
     public void givenVehicle_WhenPark_ShouldReturnTrue() throws ParkingLotException {
@@ -126,6 +125,7 @@ public class ParkingLotServiceTest {
         boolean isParked = parkingLot.isParked(car2);
         assertTrue(isParked);
     }
+
     /**
      * UC 7 : As a driver I want to find the car
      */
@@ -147,5 +147,18 @@ public class ParkingLotServiceTest {
         time = LocalDateTime.now();
         System.out.println(time.withNano(0));
         assertEquals(time.withNano(0), parkingLot.parkingTime(car1));
+    }
+
+    /**
+     * UC9 : to park the car evenly
+     * @throws ParkingLotException
+     */
+    @Test
+    public void givenCar_ShouldBeParked_WithEvenDistribution() throws ParkingLotException {
+        parkingLot.parkVehicle(car1);                // parked in lotNumber == 1
+        int key1 = parkingLot.getVehicle(car1);
+        parkingLot.parkVehicle(car2);                // parked in lotNumber == 1
+        int key2 = parkingLot.getVehicle(car2);
+        assertNotEquals(key1, key2);
     }
 }
