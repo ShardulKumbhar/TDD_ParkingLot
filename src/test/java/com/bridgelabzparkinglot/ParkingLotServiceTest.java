@@ -1,38 +1,52 @@
 package com.bridgelabzparkinglot;
 
 
+import com.bridgelabzparkinglot.Service.ParkingLot;
 import com.bridgelabzparkinglot.entity.AirportSecurity;
 import com.bridgelabzparkinglot.entity.Car;
 import com.bridgelabzparkinglot.entity.Owner;
-import com.bridgelabzparkinglot.entity.ParkingLot;
 import com.bridgelabzparkinglot.exception.ParkingLotException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ParkingLotServiceTest {
-    ParkingLot parkingLot = null;
-    Owner owner = null;
-    AirportSecurity security = null;
+
+    ParkingLot parkingLot;
+    Owner owner;
+    AirportSecurity airportSecurity;
+
+    /**
+     * Created object of class car
+     */
+    public static Car car1 = new Car(1, "MH-12-7744");
+    public static Car car2 = new Car(2, "MH-89-7896");
+    public static Car car3 = new Car(3, "KA-20-4587");
+    public static Car car4 = new Car(4, "GA-30-7895");
 
     @BeforeEach
     public void setUp() {
         parkingLot = new ParkingLot();
+        airportSecurity = new AirportSecurity();
         owner = new Owner();
-        security = new AirportSecurity();
     }
+
 
     /**
      * UC1- to park
      *
-     * @throws ParkingLotException
      */
     @Test
     public void givenVehicle_WhenPark_ShouldReturnTrue() throws ParkingLotException {
-        Car car = new Car("1", "MH-Swift");
-        parkingLot.parkVehicle(car);
-        boolean isParked = parkingLot.isParked(car);
-        Assertions.assertTrue(isParked);
+        parkingLot.parkVehicle(car1);
+        boolean isParked = parkingLot.isParked(car1);
+        assertTrue(isParked);
     }
+
 
     /**
      * UC-2 to Unpark
@@ -41,22 +55,13 @@ public class ParkingLotServiceTest {
      */
     @Test
     public void givenVehicleIfParked_WhenUnParked_ShouldReturnTrue() throws ParkingLotException {
-        Car car = new Car("1", "MH-Swift");
-        parkingLot.parkVehicle(car);
-        parkingLot.unParkVehicle(car);
-        boolean isUnParked = parkingLot.isUnParked(car);
-        Assertions.assertTrue(isUnParked);
-    }
-
-    @Test
-    public void givenVehicleToUnPark_WhenNull_ShouldThrowException() {
         try {
-            Car car = new Car("1", "MH-Swift");
-            parkingLot.parkVehicle(car);
-            parkingLot.unParkVehicle(null);
+            parkingLot.parkVehicle(car1);
+            int key = parkingLot.getVehicle(car1);
+            parkingLot.unParkVehicle(key);
         } catch (ParkingLotException e) {
-            System.out.println(e.type);
-            Assertions.assertEquals(ParkingLotException.ExceptionType.NO_SUCH_VEHICLE, e.type);
+            boolean isUnParked = parkingLot.isUnParked(car1);
+            assertTrue(isUnParked);
         }
     }
 
@@ -66,63 +71,59 @@ public class ParkingLotServiceTest {
      * @throws ParkingLotException
      */
     @Test
-    public void givenVehicleToPark_WhenOwner_ShouldInformInformLotFull() throws ParkingLotException {
-        parkingLot.addMonitor(owner);
-        Car car = new Car("1", "MH-Swift");
-        Car car2 = new Car("2", "KA-Venu");
-        parkingLot.parkVehicle(car);
-        parkingLot.parkVehicle(car2);
-        Assertions.assertEquals("Parking Lot Is Full", owner.getMessage());
+    public void givenParkingLot_IfFull_ShouldThrowException_LotIsFull() {
+        try {
+            parkingLot.parkVehicle(car1);
+            parkingLot.parkVehicle(car2);
+            parkingLot.parkVehicle(car3);
+        } catch (ParkingLotException e) {
+            System.out.println(e.message);
+            assertEquals("Parking Lot Is Full", e.message);
+        }
     }
 
     /**
-     * UC4 -to show parking lot is full - to security and owner
+     * UC4 -to show parking lot is full - to Airportsecurity
      *
      * @throws ParkingLotException
      */
     @Test
-    public void givenVehicleToPark_WhenOwnerAndSecurity_ShouldInformInformLotFull() throws ParkingLotException {
-        parkingLot.addMonitor(owner);
-        parkingLot.addMonitor(security);
-        Car car = new Car("1", "MH-Swift");
-        Car car2 = new Car("2", "KA-Venu");
-        parkingLot.parkVehicle(car);
-        parkingLot.parkVehicle(car2);
-        Assertions.assertEquals("Parking Lot Is Full", owner.getMessage());
-        Assertions.assertEquals("Parking Lot Is Full", security.getMessage());
-    }
-
-    /**
-     * UC5 - showing lot full when more vehicles get parked
-     */
-    @Test
-    public void givenVehicleToPark_WhenMoreNumberOfVehicles_ShouldThrowException() {
+    public void givenVehicleToPark_WhenLotFull_ShouldNotifyAirportSecurity() {
         try {
-            parkingLot.addMonitor(owner);
-            Car car = new Car("1", "MH_Swift");
-            Car car2 = new Car("2", "KA-Venu");
-            Car car3 = new Car("3", "GA-polo");
-            parkingLot.parkVehicle(car);
+            parkingLot.parkVehicle(car1);
             parkingLot.parkVehicle(car2);
             parkingLot.parkVehicle(car3);
         } catch (ParkingLotException e) {
-            Assertions.assertEquals(ParkingLotException.ExceptionType.LOT_FULL, e.type);
+            assertEquals("Parking Lot Is Full", airportSecurity.getMessage());
         }
     }
 
     /**
-     * When mismatch vehicle is unparked
+     * UC 5 : Notify the owner to take in Full sign.
      */
     @Test
-    public void givenVehicleToUnPark_WhenWrongVehicle_ShouldThrowException() {
+    public void givenWhenSpaceAvailable_ShouldNotifyOwner_ToTakeInTheFullSign() throws ParkingLotException {
         try {
-            Car car = new Car("1", "MH-Swift");
-            Car car2 = new Car("2", "KA-polo");
-            parkingLot.parkVehicle(car);
-            parkingLot.unParkVehicle(car2);
+            parkingLot.parkVehicle(car1);
+            parkingLot.parkVehicle(car2);
+            int key = parkingLot.getVehicle(car1);
+            parkingLot.unParkVehicle(key);
+            int key1 = parkingLot.getVehicle(car2);
+            parkingLot.unParkVehicle(key1);
+            parkingLot.parkVehicle(car3);
         } catch (ParkingLotException e) {
-            System.out.println(e.type);
-            Assertions.assertEquals(ParkingLotException.ExceptionType.VEHICLE_MISMATCH, e.type);
+            assertEquals("Space Available", owner.getMessage());
         }
+    }
+
+    /**
+     * UC 6 : As a parking lot Owner I want a parking attendant to park cars
+     */
+    @Test
+    public void givenAttendant_WhenInstructed_ShouldParkCars_AndReturnTrue() throws ParkingLotException {
+        parkingLot.parkVehicle(car1);
+        parkingLot.parkVehicle(car2);
+        boolean isParked = parkingLot.isParked(car2);
+        assertTrue(isParked);
     }
 }
