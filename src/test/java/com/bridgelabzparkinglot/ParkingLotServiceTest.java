@@ -136,4 +136,16 @@ public class ParkingLotServiceTest {
         int lotNumber = parkingLot.getVehicle(car2);
         assertEquals(2, lotNumber);
     }
+
+    /**
+     * UC 8 :know the parking Time so that I can charge lot users.
+     */
+    @Test
+    public void givenVehicle_whenParked_ShouldReturnParkingTime() throws ParkingLotException {
+        parkingLot.parkVehicle(car1);
+        LocalDateTime time;
+        time = LocalDateTime.now();
+        System.out.println(time.withNano(0));
+        assertEquals(time.withNano(0), parkingLot.parkingTime(car1));
+    }
 }
